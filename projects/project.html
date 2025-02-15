@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulkit's Projects</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/image/p2-removebg-preview-modified.ico" type="image/x-icon">
+    <style>
+        body {
+            background: #2c66d6; /* Solid blue color */
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            padding: 50px 20px;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .projects-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            width: 350px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px) rotateX(15deg) rotateY(25deg) ; /* Tilts the card inwards */
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .project-card img {
+            width: 70%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .buttons {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .live-btn, .code-btn {
+            text-decoration: none;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .live-btn {
+            background: linear-gradient(135deg, #ff7eb3, #ff758c);
+        }
+
+        .live-btn:hover {
+            background: linear-gradient(135deg, #ff3d7f, #ff004f);
+            transform: translateY(-5px);
+        }
+
+        .code-btn {
+            background: linear-gradient(135deg, #42e695, #3bb2b8);
+        }
+
+        .code-btn:hover {
+            background: linear-gradient(135deg, #2db782, #259095);
+            transform: translateY(-5px);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Pulkit's Projects</h1>
+        <div class="projects-grid">
+            <div class="project-card">
+                <img src="./icon1.ico" alt="Royal Route All Over India">
+                <h2>Royal Route All Over India</h2>
+                <p>Museum ticket booking system integrated with a chatbot.</p>
+                <div class="buttons">
+                    <a href="#" class="live-btn">Live Demo</a>
+                    <a href="#" class="code-btn">GitHub</a>
+                </div>
+            </div>
+            <div class="project-card">
+                <img src="./finally-modified.png" alt="SwasthSetu">
+                <h2>SwasthSetu</h2>
+                <p>A bridge to healthcare providing seamless medical assistance.</p>
+                <div class="buttons">
+                    <a href="#" class="live-btn">Live Demo</a>
+                    <a href="#" class="code-btn">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
