@@ -17,7 +17,6 @@ body {
     animation: headerMove 2s ease-out forwards, colorChange 3s ease-in-out infinite alternate;
 }
 
-/* Profile Image */
 .profile-img-container {
     display: flex;
     justify-content: center;
@@ -32,7 +31,7 @@ body {
     border-radius: 50%;
     object-fit: cover;
     border: 5px solid white;
-    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
     animation: zoomIn 2s ease-out, pulse 3s infinite alternate;
 }
 
@@ -48,24 +47,24 @@ body {
     animation: textAppear 2s ease-out 1s forwards;
 }
 
-/* Navbar Styling */
+/* Navbar */
 .navbar {
     background-color: #333;
     position: sticky;
-    z-index: 1000; /* Ensures navbar stays on top */
+    top: 0;
+    z-index: 1000;
     padding: 15px 20px;
     text-align: center;
-    position: sticky;
-    top: 0;
     animation: navbarSlide 1s ease-in-out forwards;
 }
 
 .navbar ul {
-    list-style-type: none;
+    list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
     gap: 20px;
 }
 
@@ -79,9 +78,8 @@ body {
     font-size: 1.1rem;
     padding: 8px 16px;
     position: relative;
-    overflow: hidden;
     text-transform: uppercase;
-    transition: color 0.3s ease, background-color 0.3s ease;
+    transition: 0.3s ease;
 }
 
 .navbar a::before {
@@ -108,12 +106,13 @@ body {
     border-radius: 5px;
 }
 
-/* Skill Section */
+/* Skills Section */
 .skills-list {
     display: flex;
     justify-content: center;
-    gap: 40px;
     flex-wrap: wrap;
+    gap: 30px;
+    padding: 40px 20px;
     animation: fadeInUp 2s ease-out forwards;
 }
 
@@ -121,17 +120,21 @@ body {
     background-color: #fff;
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
-    width: 250px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 250px;
     opacity: 0;
     animation: skillSlideIn 1.5s ease-out forwards;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    position: relative;
+    text-align: center;
 }
 
 .skill:hover {
     background-color: #0d0346;
     color: #fff;
     transform: scale(1.1);
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .skill:hover::before {
@@ -144,36 +147,37 @@ body {
     animation: sparkle 1s infinite;
 }
 
-/* Job and Experience Section */
+/* Job / Project / Experience Section */
 .job, .project, .experience {
     background-color: #fff;
     border-radius: 8px;
     padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    opacity: 0;
+    margin: 20px auto;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     animation: jobFadeIn 1.5s ease-out forwards, jobSlideUp 1s ease-out forwards;
+    transition: transform 0.3s ease;
 }
 
 .job:hover, .project:hover, .experience:hover {
     transform: scale(1.05);
 }
 
-/* Contact Section */
+/* Contact */
 .contact a {
     color: #00ccff;
     text-decoration: none;
     font-weight: bold;
-    transition: color 0.3s ease;
     animation: textShadowGlow 3s infinite alternate;
+    transition: color 0.3s ease;
 }
 
 .contact a:hover {
-    color: #ff6347;
+    color: #ff6347e1;
 }
 
-/* Footer Section */
+/* Footer */
 .footer {
     background-color: #333;
     color: white;
@@ -181,11 +185,24 @@ body {
     text-align: center;
 }
 
-/* Animations */
-@keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+/* Project Link */
+.project-link a {
+    color: #00ccff;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    display: inline-block;
+    margin-top: 20px;
+    transition: color 0.3s ease;
 }
+
+.project-link a:hover {
+    color: #ff6347;
+    text-decoration: underline;
+}
+
+/* Animations */
+@keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
 
 @keyframes slideInFromTop {
     0% { transform: translateY(-100%); opacity: 0; }
@@ -239,12 +256,30 @@ body {
     100% { transform: translateY(0); }
 }
 
-/* Hover Effects */
-.navbar a:hover, .skill:hover, .job:hover, .project:hover, .experience:hover {
-    transform: scale(1.05);
+/* Responsive Styles */
+@media (max-width: 1024px) {
+    .header h1, .header h2 {
+        font-size: 2.2rem;
+    }
+
+    .profile-img {
+        width: 130px;
+        height: 130px;
+    }
+
+    .navbar ul {
+        gap: 15px;
+    }
+
+    .skills-list {
+        gap: 25px;
+    }
+
+    .skill {
+        max-width: 220px;
+    }
 }
 
-/* Mobile Responsive */
 @media (max-width: 768px) {
     .header {
         padding: 50px 15px;
@@ -270,57 +305,11 @@ body {
     }
 
     .skill {
-        width: 200px;
-        margin: 10px;
+        width: 90%;
+        max-width: none;
     }
 
     .job, .project, .experience {
         width: 90%;
-        margin: 10px auto;
     }
-}
-
-/* Laptop Responsive */
-@media (max-width: 1024px) {
-    .header h1, .header h2 {
-        font-size: 2.2rem;
-    }
-
-    .profile-img {
-        width: 130px;
-        height: 130px;
-    }
-
-    .navbar ul {
-        gap: 15px;
-    }
-
-    .skills-list {
-        flex-direction: row;
-        gap: 30px;
-    }
-
-    .skill {
-        width: 230px;
-    }
-
-    .job, .project, .experience {
-        width: 45%;
-        margin: 10px 0;
-    }
-}
-/* Project Link Styling */
-.project-link a {
-    color: #00ccff;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 1.2rem;
-    display: inline-block;
-    margin-top: 20px;
-    transition: color 0.3s ease;
-}
-
-.project-link a:hover {
-    color: #ff6347;
-    text-decoration: underline;
 }
