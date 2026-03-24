@@ -422,8 +422,8 @@ body::-webkit-scrollbar {
 
 .hero-shape {
   position: relative;
-  width: 350px;
-  height: 350px;
+  width: 450px;
+  height: 450px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -458,8 +458,8 @@ body::-webkit-scrollbar {
 .hero-image {
   position: relative;
   z-index: 2;
-  width: 280px;
-  height: 280px;
+  width: 350px;
+  height: 350px;
   border-radius: 50%;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -971,7 +971,7 @@ body::-webkit-scrollbar {
 }
 
 .skill-icon {
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   margin-bottom: 15px;
   color: var(--primary-color);
   transition: transform 0.3s ease;
@@ -990,9 +990,9 @@ body::-webkit-scrollbar {
 
 .skill-progress {
   position: relative;
-  height: 8px;
+  height: 18px;
   background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+  border-radius: 10px;
   overflow: hidden;
 }
 
@@ -1958,92 +1958,272 @@ body::-webkit-scrollbar {
 }
 
 @media (max-width: 768px) {
-  .navbar .container {
-    padding: 0 20px;
-  }
-  
-  .menu-toggle {
-    display: flex;
-  }
-  
-  .nav-links {
-    position: fixed;
-    top: 70px;
-    left: 0;
-    width: 100%;
-    background-color: white;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px 0;
-    box-shadow: var(--shadow-md);
-    transform: translateY(-100%);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 999;
-  }
-  
-  .nav-links.active {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
-  }
-  
-  .nav-links li {
-    margin: 10px 0;
-  }
-  
-  .hero-content {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .hero-text {
-    padding-right: 0;
-    margin-bottom: 50px;
-  }
-  
-  .hero-buttons {
-    justify-content: center;
-  }
-  
-  .social-icons {
-    justify-content: center;
-  }
-  
-  .hero-text h1 {
-    font-size: 2.5rem;
-  }
-  
-  .hero-job-title {
-    font-size: 1.5rem;
-  }
-  
-  .about-content {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  
-  .about-stats {
-    justify-content: center;
-  }
-  
-  .image-wrapper {
-    margin-bottom: 70px;
-  }
-  
-  .skills-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .projects-grid {
-    grid-template-columns: 1fr;
-  }
-  
-    .modal-body {
-      flex-direction: column;
+    /* Navbar Mobile Menu */
+    .menu-toggle {
+        display: flex;
+        z-index: 1001;
     }
+
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 70%; /* Side drawer style is better for UX */
+        height: 100vh;
+        background-color: var(--bg-light);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        transform: translateX(100%); /* Slide from right */
+        opacity: 1;
+        visibility: visible;
+        transition: transform 0.4s cubic-bezier(0.77,0.2,0.05,1.0);
+    }
+
+    .nav-links.active {
+        transform: translateX(0);
+    }
+
+    /* Hero Section Mobile */
+    .hero {
+        padding-top: 100px;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .hero-content {
+        flex-direction: column-reverse; /* Text usually comes first on mobile */
+        text-align: center;
+    }
+
+    .hero-text {
+        padding-right: 0;
+        margin-top: 40px;
+        max-width: 100%;
+    }
+
+    .hero-text h1 {
+        font-size: 2.2rem;
+    }
+
+    .hero-job-title {
+        font-size: 1.4rem;
+    }
+
+    .hero-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        width: 100%; /* Stack buttons on small mobile */
+        max-width: 250px;
+    }
+
+    .hero-visual {
+        transform: translateX(0);
+        margin-bottom: 20px;
+    }
+
+    .hero-shape {
+        width: 280px;
+        height: 280px;
+    }
+
+    .hero-image {
+        width: 220px;
+        height: 220px;
+    }
+
+    /* About Stats Fix */
+    .about-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    /* Testimonials Fix (Crucial) */
+    .testimonials-container {
+        height: auto; /* Remove fixed height */
+        min-height: 350px;
+    }
+
+    .testimonial-card {
+        position: relative; /* Allow flow */
+        margin-bottom: 20px;
+        display: none; /* Only active shows */
+    }
+
+    .testimonial-card.active {
+        display: block;
+    }
+}
+
+
+@media (max-width: 1024px) {
+    .container {
+        width: 92%;
+    }
+    
+    .hero-text h1 {
+        font-size: 3rem;
+    }
+
+    .hero-shape {
+        width: 380px;
+        height: 380px;
+    }
+
+    .hero-image {
+        width: 300px;
+        height: 300px;
+    }
+}
+
+@media (max-width: 992px) {
+    /* Timeline Fix for Tablets */
+    .timeline-container::before {
+        left: 30px;
+        transform: none;
+    }
+
+    .timeline-item {
+        justify-content: flex-start !important;
+        padding-left: 70px;
+        margin-bottom: 40px;
+    }
+
+    .timeline-icon {
+        left: 30px;
+    }
+
+    .timeline-content {
+        width: 100%;
+    }
+
+    .timeline-item:nth-child(even) .timeline-content::before,
+    .timeline-item:nth-child(odd) .timeline-content::before {
+        left: -10px;
+        right: auto;
+    }
+
+    /* About Section Fix */
+    .about-content {
+        gap: 30px;
+    }
+    
+    .image-wrapper {
+        transform: none; /* Removing rotation for better mobile viewing */
+    }
+}
+
+
+@media (max-width: 480px) {
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .hero-text h1 {
+        font-size: 1.8rem;
+    }
+
+    .image-wrapper {
+        width: 260px;
+        height: 260px;
+    }
+
+    .experience-badge {
+        width: 80px;
+        height: 80px;
+        right: -10px;
+        bottom: -10px;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 10px;
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    .contact-form {
+        padding: 20px;
+    }
+    .footer{
+    text-align: center;
+    }
+    .social-links{
+    justify-content: center;
+    }
+}
+
+
+/* ===== EXTRA SMALL DEVICES (320px) ===== */
+@media (max-width: 330px) {
+  .container {
+    width: 95%; /* Give more room to content */
+    padding: 10px 0;
   }
-  
-  
+
+  .hero-text h1 {
+    font-size: 1.6rem; /* Shrink title to prevent awkward wrapping */
+    letter-spacing: -1px;
+  }
+
+  .hero-job-title {
+    font-size: 1.2rem;
+  }
+
+  .hero-shape {
+    width: 220px;
+    height: 220px;
+  }
+
+  .hero-image {
+    width: 180px;
+    height: 180px;
+  }
+
+  .image-wrapper {
+    width: 220px;
+    height: 220px;
+  }
+
+  /* Stack stats in a single column so they don't overlap */
+  .about-stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+  }
+
+  /* Adjust Timeline for tight space */
+  .timeline-item {
+    padding-left: 50px;
+  }
+
+  .timeline-icon {
+    left: 15px;
+    width: 30px;
+    height: 30px;
+  }
+
+  .timeline-container::before {
+    left: 15px;
+  }
+
+  /* Form padding reduction */
+  .contact-form {
+    padding: 15px;
+  }
+
+  .submit-btn {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+}

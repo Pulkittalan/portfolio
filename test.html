@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>Pulkit Kumar Talan | 3D Interactive Portfolio</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>" type="image/svg+xml"/>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Montserrat:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Three.js Core & Addons -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+      }
+    }
+  </script>
+  
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #6c63ff;
+      --secondary: #00c6ff;
+      --accent: #ffde59;
+      --dark: #0a0f2a;
+      --light: #ffffff;
+      --glass: rgba(255, 255, 255, 0.1);
+      --gradient: linear-gradient(135deg, #6c63ff, #00c6ff, #ff6b6b);
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--dark);
+      color: white;
+      overflow-x: hidden;
+    }
+
+    /* Canvas 3D Background */
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Main Content */
+    .main-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Loader */
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--dark);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      transition: opacity 1s ease;
+    }
+    .loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .loader-3d {
+      width: 80px;
+      height: 80px;
+      position: relative;
+    }
+    .loader-3d div {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: var(--primary);
+      animation: spin 1s linear infinite;
+    }
+    .loader-3d div:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      top: 10px;
+      left: 10px;
+      border-top-color: var(--secondary);
+      animation-duration: 0.8s;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Glassmorphic Navbar */
+    .navbar {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 1200px;
+      background: rgba(10, 15, 42, 0.7);
+      backdrop-filter: blur(12px);
+      border-radius: 50px;
+      padding: 12px 30px;
+      z-index: 1000;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(108, 99, 255, 0.3);
+    }
+    .navbar.scrolled {
+      top: 10px;
+      background: rgba(10, 15, 42, 0.9);
+      border-color: var(--primary);
+    }
+    .navbar .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 28px;
+      font-weight: 800;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.3s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient);
+      transition: width 0.3s;
+    }
+    .nav-links a:hover::after,
+    .nav-links a.active::after {
+      width: 100%;
+    }
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+    }
+    .bar {
+      width: 25px;
+      height: 3px;
+      background: white;
+      margin: 3px 0;
+      transition: 0.3s;
+    }
+
+    /* Hero Section with 3D Text */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 100px 20px;
+    }
+    .hero-content {
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .hero-glow {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(108,99,255,0.3), transparent);
+      border-radius: 50%;
+      filter: blur(60px);
+      animation: pulseGlow 4s ease-in-out infinite;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.2); opacity: 0.8; }
+    }
+    .hero-title {
+      font-size: 4.5rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: titleFloat 3s ease-in-out infinite;
+    }
+    @keyframes titleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .hero-subtitle {
+      font-size: 1.8rem;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    .typing-text {
+      font-size: 1.5rem;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 30px;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 12px 32px;
+      border-radius: 50px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 0 20px rgba(108,99,255,0.5);
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 30px rgba(108,99,255,0.8);
+    }
+    .btn-outline {
+      border: 2px solid var(--primary);
+      color: white;
+      background: transparent;
+    }
+    .btn-outline:hover {
+      background: var(--primary);
+      transform: translateY(-3px);
+    }
+    .social-icons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 40px;
+    }
+    .social-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      transition: 0.3s;
+      backdrop-filter: blur(5px);
+    }
+    .social-icon:hover {
+      background: var(--primary);
+      transform: translateY(-5px) rotate(360deg);
+    }
+
+    /* 3D Card Sections */
+    .section {
+      padding: 100px 20px;
+      position: relative;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-title {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #fff, var(--primary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .section-subtitle {
+      text-align: center;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 60px;
+    }
+
+    /* 3D Flip Cards for Skills */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      perspective: 1000px;
+    }
+    .skill-3d-card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      transition: 0.5s;
+      transform-style: preserve-3d;
+      border: 1px solid rgba(108,99,255,0.3);
+    }
+    .skill-3d-card:hover {
+      transform: rotateY(10deg) rotateX(5deg) translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      border-color: var(--primary);
+    }
+    .skill-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .skill-progress {
+      height: 8px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      margin-top: 15px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      width: 0;
+      border-radius: 10px;
+      transition: width 1.5s ease;
+    }
+
+    /* 3D Image Gallery */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 40px;
+    }
+    .project-3d-card {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: 0.5s;
+      cursor: pointer;
+    }
+    .project-3d-card:hover {
+      transform: translateY(-15px) rotateX(5deg);
+    }
+    .project-image {
+      height: 250px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .project-image::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: 0.5s;
+    }
+    .project-3d-card:hover .project-image::before {
+      left: 100%;
+    }
+    .project-info {
+      padding: 25px;
+      background: rgba(10,15,42,0.8);
+      backdrop-filter: blur(10px);
+    }
+    .project-tech span {
+      display: inline-block;
+      padding: 5px 12px;
+      background: rgba(108,99,255,0.3);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin: 5px;
+    }
+
+    /* Floating 3D Elements */
+    .floating-3d {
+      position: absolute;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Timeline 3D */
+    .timeline-3d {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .timeline-item {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 50px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: 0.3s;
+    }
+    .timeline-item:hover {
+      transform: translateX(10px);
+    }
+    .timeline-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .timeline-content {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 15px;
+      flex: 1;
+      border: 1px solid rgba(108,99,255,0.3);
+    }
+
+    /* Contact 3D Form */
+    .contact-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 50px;
+    }
+    .contact-info-3d {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      transform-style: preserve-3d;
+      transition: 0.3s;
+    }
+    .contact-info-3d:hover {
+      transform: rotateY(5deg);
+    }
+    .contact-form-3d {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 15px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(108,99,255,0.3);
+      border-radius: 10px;
+      color: white;
+      margin-bottom: 20px;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* Scroll Indicator */
+    .scroll-down {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(15px); }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: rgba(10,15,42,0.95);
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+        border-radius: 20px;
+      }
+      .nav-links.active {
+        display: flex;
+      }
+      .menu-toggle {
+        display: flex;
+      }
+      .hero-title {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="loader" id="loader">
+  <div class="loader-3d">
+    <div></div>
+    <div></div>
+  </div>
+</div>
+
+<div id="canvas-container"></div>
+
+<div class="main-content">
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <div class="logo">PKT</div>
+      <div class="menu-toggle" id="menuToggle">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home" class="nav-link active">Home</a></li>
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#skills" class="nav-link">Skills</a></li>
+        <li><a href="#projects" class="nav-link">Projects</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section id="home" class="hero">
+    <div class="hero-glow" style="top: 20%; left: 20%;"></div>
+    <div class="hero-glow" style="bottom: 20%; right: 20%; animation-delay: -2s;"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">Pulkit Kumar Talan</h1>
+      <div class="hero-subtitle">Software Developer</div>
+      <div class="typing-text">
+        <span id="typed-text"></span><span class="cursor">|</span>
+      </div>
+      <div class="hero-buttons">
+        <a href="#projects" class="btn btn-primary">Explore Work</a>
+        <a href="#contact" class="btn btn-outline">Contact Me</a>
+      </div>
+      <div class="social-icons">
+        <a href="https://www.linkedin.com/in/pulkit-kumar-talan/" target="_blank" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+        <a href="https://github.com/Pulkittalan" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+        <a href="https://leetcode.com/u/pulkittalangbu/" target="_blank" class="social-icon"><i class="fas fa-code"></i></a>
+      </div>
+    </div>
+    <div class="scroll-down">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+  </section>
+
+  <section id="about" class="section">
+    <div class="container">
+      <h2 class="section-title">About Me</h2>
+      <p class="section-subtitle">Passionate Developer | Creative Problem Solver</p>
+      <div style="max-width: 800px; margin: 0 auto; text-align: center; background: rgba(255,255,255,0.05); padding: 40px; border-radius: 30px; backdrop-filter: blur(10px);">
+        <p style="font-size: 1.2rem; line-height: 1.8;">I'm a full-stack developer with expertise in creating stunning web experiences. I love combining creativity with technical skills to build amazing digital solutions. Currently exploring 3D web technologies and mobile app development.</p>
+        <div style="display: flex; justify-content: center; gap: 40px; margin-top: 40px; flex-wrap: wrap;">
+          <div><h3 style="font-size: 2rem; color: var(--primary);">6+</h3><p>Months Experience</p></div>
+          <div><h3 style="font-size: 2rem; color: var(--primary);">10+</h3><p>Projects Completed</p></div>
+          <div><h3 style="font-size: 2rem; color: var(--primary);">500+</h3><p>Hours of Coding</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills" class="section">
+    <div class="container">
+      <h2 class="section-title">Technical Skills</h2>
+      <p class="section-subtitle">Mastering the Art of Development</p>
+      <div class="skills-grid">
+        <div class="skill-3d-card">
+          <div class="skill-icon"><i class="fab fa-html5"></i></div>
+          <h3>HTML5</h3>
+          <div class="skill-progress"><div class="progress-fill" data-progress="95"></div></div>
+        </div>
+        <div class="skill-3d-card">
+          <div class="skill-icon"><i class="fab fa-css3-alt"></i></div>
+          <h3>CSS3</h3>
+          <div class="skill-progress"><div class="progress-fill" data-progress="90"></div></div>
+        </div>
+        <div class="skill-3d-card">
+          <div class="skill-icon"><i class="fab fa-js"></i></div>
+          <h3>JavaScript</h3>
+          <div class="skill-progress"><div class="progress-fill" data-progress="85"></div></div>
+        </div>
+        <div class="skill-3d-card">
+          <div class="skill-icon"><i class="fab fa-react"></i></div>
+          <h3>React</h3>
+          <div class="skill-progress"><div class="progress-fill" data-progress="70"></div></div>
+        </div>
+        <div class="skill-3d-card">
+          <div class="skill-icon"><i class="fab fa-python"></i></div>
+          <h3>Python</h3>
+          <div class="skill-progress"><div class="progress-fill" data-progress="75"></div></div>
+        </div>
+        <div class="skill-3d-card">
+          <div class="skill-icon"><i class="fas fa-database"></i></div>
+          <h3>SQL</h3>
+          <div class="skill-progress"><div class="progress-fill" data-progress="80"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects" class="section">
+    <div class="container">
+      <h2 class="section-title">Featured Projects</h2>
+      <p class="section-subtitle">Creative & Innovative Solutions</p>
+      <div class="projects-grid">
+        <div class="project-3d-card">
+          <div class="project-image">
+            <i class="fas fa-route"></i>
+          </div>
+          <div class="project-info">
+            <h3>Royal Route India</h3>
+            <p>Museum ticket booking system with AI chatbot integration</p>
+            <div class="project-tech">
+              <span>HTML5</span><span>CSS3</span><span>JavaScript</span>
+            </div>
+            <a href="https://pulkittalan.github.io/royal_route/home/index.html" target="_blank" style="color: var(--primary); display: inline-block; margin-top: 15px;">Live Demo →</a>
+          </div>
+        </div>
+        <div class="project-3d-card">
+          <div class="project-image">
+            <i class="fas fa-heartbeat"></i>
+          </div>
+          <div class="project-info">
+            <h3>SwasthSetu</h3>
+            <p>Healthcare bridge platform providing seamless medical assistance</p>
+            <div class="project-tech">
+              <span>HTML</span><span>CSS</span><span>JS</span><span>MySQL</span>
+            </div>
+            <a href="https://pulkittalan.github.io/swasthyasetu/healthcare-landing/public/index.html" target="_blank" style="color: var(--primary); display: inline-block; margin-top: 15px;">Live Demo →</a>
+          </div>
+        </div>
+        <div class="project-3d-card">
+          <div class="project-image">
+            <i class="fas fa-cube"></i>
+          </div>
+          <div class="project-info">
+            <h3>3D Portfolio Experience</h3>
+            <p>Interactive 3D portfolio with Three.js animations</p>
+            <div class="project-tech">
+              <span>Three.js</span><span>GSAP</span><span>WebGL</span>
+            </div>
+            <a href="#" style="color: var(--primary); display: inline-block; margin-top: 15px;">View Project →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="timeline" class="section">
+    <div class="container">
+      <h2 class="section-title">My Journey</h2>
+      <p class="section-subtitle">Professional & Academic Path</p>
+      <div class="timeline-3d">
+        <div class="timeline-item">
+          <div class="timeline-icon"><i class="fas fa-school"></i></div>
+          <div class="timeline-content"><h3>Class 10th</h3><p>2020 - Completed with distinction</p></div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon"><i class="fas fa-school"></i></div>
+          <div class="timeline-content"><h3>Class 12th</h3><p>2023 - Science stream</p></div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon"><i class="fas fa-graduation-cap"></i></div>
+          <div class="timeline-content"><h3>B.Tech Computer Science</h3><p>2023 - 2027 | Current Student</p></div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon"><i class="fas fa-briefcase"></i></div>
+          <div class="timeline-content"><h3>Web Developer Intern</h3><p>Feb 2024 - May 2024 | P.K. Builders</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section">
+    <div class="container">
+      <h2 class="section-title">Get In Touch</h2>
+      <p class="section-subtitle">Let's Work Together</p>
+      <div class="contact-container">
+        <div class="contact-info-3d">
+          <div style="text-align: center;">
+            <i class="fas fa-envelope" style="font-size: 3rem; color: var(--primary);"></i>
+            <h3>Email</h3>
+            <p>pulkittalan345@gmail.com</p>
+            <i class="fas fa-phone" style="font-size: 3rem; color: var(--primary); margin-top: 20px;"></i>
+            <h3>Phone</h3>
+            <p>+91 8368937971</p>
+            <i class="fas fa-map-marker-alt" style="font-size: 3rem; color: var(--primary); margin-top: 20px;"></i>
+            <h3>Location</h3>
+            <p>Greater Noida, India</p>
+          </div>
+        </div>
+        <div class="contact-form-3d">
+          <form id="contactForm">
+            <div class="form-group"><input type="text" placeholder="Your Name" required></div>
+            <div class="form-group"><input type="email" placeholder="Your Email" required></div>
+            <div class="form-group"><textarea rows="4" placeholder="Your Message" required></textarea></div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message <i class="fas fa-paper-plane"></i></button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer style="text-align: center; padding: 40px; border-top: 1px solid rgba(255,255,255,0.1);">
+    <p>&copy; 2025 Pulkit Kumar Talan. All rights reserved. | Built with ❤️ and Three.js</p>
+  </footer>
+</div>
+
+<script type="module">
+  import * as THREE from 'https://unpkg.com/three@0.128.0/build/three.module.js';
+  import { OrbitControls } from 'https://unpkg.com/three@0.128.0/examples/jsm/controls/OrbitControls.js';
+
+  // Setup Three.js Scene
+  const container = document.getElementById('canvas-container');
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0f2a);
+  scene.fog = new THREE.FogExp2(0x0a0f2a, 0.008);
+
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 2, 8);
+  
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  container.appendChild(renderer.domElement);
+
+  // Stars Background
+  const starGeometry = new THREE.BufferGeometry();
+  const starCount = 2000;
+  const starPositions = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount; i++) {
+    starPositions[i*3] = (Math.random() - 0.5) * 2000;
+    starPositions[i*3+1] = (Math.random() - 0.5) * 1000;
+    starPositions[i*3+2] = (Math.random() - 0.5) * 500 - 200;
+  }
+  starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+  const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.3, transparent: true, opacity: 0.6 });
+  const stars = new THREE.Points(starGeometry, starMaterial);
+  scene.add(stars);
+
+  // Main 3D Object - Rotating Torus Knot
+  const knotGeometry = new THREE.TorusKnotGeometry(1, 0.3, 200, 32, 3, 4);
+  const knotMaterial = new THREE.MeshStandardMaterial({ color: 0x6c63ff, metalness: 0.8, roughness: 0.2, emissive: 0x1a1a4a, emissiveIntensity: 0.5 });
+  const knot = new THREE.Mesh(knotGeometry, knotMaterial);
+  knot.position.set(2, -1, -2);
+  scene.add(knot);
+
+  // Floating Spheres
+  const sphereGroup = [];
+  const colors = [0x6c63ff, 0x00c6ff, 0xff6b6b, 0xffde59];
+  for (let i = 0; i < 30; i++) {
+    const size = Math.random() * 0.15 + 0.05;
+    const sphereGeo = new THREE.SphereGeometry(size, 16, 16);
+    const sphereMat = new THREE.MeshStandardMaterial({ color: colors[Math.floor(Math.random() * colors.length)], emissive: 0x330000, emissiveIntensity: 0.3 });
+    const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+    sphere.position.set((Math.random() - 0.5) * 12, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 10 - 5);
+    scene.add(sphere);
+    sphereGroup.push({ mesh: sphere, speed: 0.005 + Math.random() * 0.01, range: Math.random() * 0.5 });
+  }
+
+  // Rotating Cube Ring
+  const cubeRing = [];
+  for (let i = 0; i < 24; i++) {
+    const cubeGeo = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+    const cubeMat = new THREE.MeshStandardMaterial({ color: 0x00c6ff, emissive: 0x0066aa, emissiveIntensity: 0.3 });
+    const cube = new THREE.Mesh(cubeGeo, cubeMat);
+    const angle = (i / 24) * Math.PI * 2;
+    const radius = 1.8;
+    cube.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius + 1, -1);
+    scene.add(cube);
+    cubeRing.push(cube);
+  }
+
+  // Lighting
+  const ambientLight = new THREE.AmbientLight(0x404060);
+  scene.add(ambientLight);
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+  directionalLight.position.set(5, 10, 7);
+  scene.add(directionalLight);
+  const backLight = new THREE.PointLight(0x6c63ff, 0.5);
+  backLight.position.set(-2, 1, -3);
+  scene.add(backLight);
+  const fillLight = new THREE.PointLight(0xff6b6b, 0.3);
+  fillLight.position.set(3, 2, 2);
+  scene.add(fillLight);
+
+  // Animation
+  let time = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    time += 0.01;
+    
+    knot.rotation.x += 0.01;
+    knot.rotation.y += 0.015;
+    knot.rotation.z += 0.005;
+    
+    stars.rotation.y += 0.0005;
+    stars.rotation.x += 0.0003;
+    
+    sphereGroup.forEach(sp => {
+      sp.mesh.position.y += Math.sin(time * sp.speed * 10) * 0.003;
+      sp.mesh.position.x += Math.cos(time * sp.speed * 8) * 0.002;
+    });
+    
+    cubeRing.forEach((cube, idx) => {
+      const angle = (idx / 24) * Math.PI * 2 + time;
+      const radius = 1.8;
+      cube.position.x = Math.cos(angle) * radius;
+      cube.position.z = Math.sin(angle) * radius;
+      cube.rotation.x += 0.02;
+      cube.rotation.y += 0.03;
+    });
+    
+    camera.position.x += (0 - camera.position.x) * 0.02;
+    camera.position.y += (1.5 - camera.position.y) * 0.02;
+    camera.lookAt(0, 0, 0);
+    
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+</script>
+
+<script>
+  // GSAP Animations
+  gsap.registerPlugin(ScrollTrigger);
+  
+  // Typing Animation
+  const texts = ["Full-Stack Developer", "UI/UX Enthusiast", "3D Animation Lover", "Problem Solver"];
+  let index = 0;
+  let charIndex = 0;
+  let isDeleting = false;
+  const typedEl = document.getElementById('typed-text');
+  
+  function typeEffect() {
+    const currentText = texts[index];
+    if (isDeleting) {
+      typedEl.textContent = currentText.substring(0, charIndex - 1);
+      charIndex--;
+    } else {
+      typedEl.textContent = currentText.substring(0, charIndex + 1);
+      charIndex++;
+    }
+    if (!isDeleting && charIndex === currentText.length) {
+      isDeleting = true;
+      setTimeout(typeEffect, 2000);
+      return;
+    }
+    if (isDeleting && charIndex === 0) {
+      isDeleting = false;
+      index = (index + 1) % texts.length;
+    }
+    setTimeout(typeEffect, isDeleting ? 50 : 100);
+  }
+  typeEffect();
+  
+  // Loader
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hidden');
+  }, 1500);
+  
+  // Navbar Scroll
+  window.addEventListener('scroll', () => {
+    const navbar = document.getElementById('navbar');
+    if (window.scrollY > 50) navbar.classList.add('scrolled');
+    else navbar.classList.remove('scrolled');
+  });
+  
+  // Mobile Menu
+  document.getElementById('menuToggle').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('active');
+  });
+  
+  // Smooth Scroll
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('navLinks').classList.remove('active');
+      }
+    });
+  });
+  
+  // Progress Bars Animation
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const fills = entry.target.querySelectorAll('.progress-fill');
+        fills.forEach(fill => {
+          const progress = fill.getAttribute('data-progress');
+          fill.style.width = progress + '%';
+        });
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  
+  document.querySelectorAll('.skill-3d-card').forEach(card => observer.observe(card));
+  
+  // Form Submit
+  document.getElementById('contactForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    alert('Thank you for reaching out! I will get back to you soon.');
+    e.target.reset();
+  });
+  
+  // Scroll Reveal for 3D Cards
+  gsap.utils.toArray('.skill-3d-card, .project-3d-card, .timeline-item').forEach(card => {
+    gsap.from(card, {
+      scrollTrigger: {
+        trigger: card,
+        start: 'top 85%',
+        toggleActions: 'play none none none'
+      },
+      opacity: 0,
+      y: 50,
+      duration: 0.8,
+      stagger: 0.1
+    });
+  });
+</script>
+</body>
+</html>

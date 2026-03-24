@@ -1,0 +1,37 @@
+body {
+  background: #111;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Container */
+.hero {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  overflow: hidden;
+  cursor: none; /* optional cool effect */
+}
+
+/* Images */
+.img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Bottom image */
+.bottom {
+  z-index: 1;
+}
+
+/* Top image */
+.top {
+  z-index: 2;
+  transition: clip-path 0.1s ease-out;
+}
+
+
